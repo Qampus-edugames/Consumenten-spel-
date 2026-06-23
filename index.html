@@ -3,570 +3,91 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Consumptie Challenge</title>
-
+<title>Consumptie Quest Deluxe</title>
 <style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-}
-
-body{
-font-family:Arial, sans-serif;
-background:#e8f4ff;
-overflow:hidden;
-}
-
-#game{
-width:100vw;
-height:100vh;
-position:relative;
-display:flex;
-flex-direction:column;
-}
-
-#background{
-flex:1;
-background-size:cover;
-background-position:center;
-transition:1s;
-position:relative;
-}
-
-.characters{
-position:absolute;
-bottom:10px;
-left:0;
-right:0;
-display:flex;
-justify-content:space-around;
-align-items:flex-end;
-}
-
-.character{
-width:120px;
-height:120px;
-}
-
-.character img{
-width:100%;
-}
-
-#hud{
-background:white;
-padding:10px;
-box-shadow:0 -2px 10px rgba(0,0,0,0.2);
-}
-
-.progress{
-width:100%;
-height:18px;
-background:#ddd;
-border-radius:20px;
-overflow:hidden;
-margin-bottom:10px;
-}
-
-#progressBar{
-height:100%;
-width:0%;
-background:#4caf50;
-transition:0.5s;
-}
-
-.stats{
-display:flex;
-justify-content:center;
-gap:20px;
-font-weight:bold;
-margin-bottom:10px;
-flex-wrap:wrap;
-}
-
-#story{
-font-size:18px;
-margin-bottom:15px;
-text-align:center;
-}
-
-#choices{
-display:flex;
-flex-direction:column;
-gap:8px;
-}
-
-button{
-padding:12px;
-border:none;
-border-radius:10px;
-background:#1976d2;
-color:white;
-font-size:16px;
-cursor:pointer;
-}
-
-button:hover{
-background:#0d47a1;
-}
-
-.result{
-text-align:left;
-padding:10px;
-}
-
-h1,h2,h3{
-margin-bottom:10px;
-}
-
-ul{
-margin-left:20px;
-}
+body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#111;color:#fff;overflow:hidden}
+#bg{position:fixed;inset:0;background-size:cover;background-position:center;transition:1s}
+#overlay{position:fixed;inset:0;background:rgba(0,0,0,.45)}
+#game{position:relative;z-index:2;height:100vh;display:flex;flex-direction:column}
+.top{padding:10px;background:rgba(0,0,0,.5)}
+.stats{display:flex;gap:15px;flex-wrap:wrap}
+.progress{height:14px;background:#555;border-radius:10px;overflow:hidden;margin-top:8px}
+.bar{height:100%;background:#4caf50}
+.main{flex:1;display:flex;align-items:flex-end;justify-content:space-between;padding:20px}
+.char{width:180px;animation:bounce 2s infinite}
+@keyframes bounce{50%{transform:translateY(-10px)}}
+.panel{background:rgba(255,255,255,.95);color:#111;padding:18px;border-radius:12px;margin:15px;max-width:900px}
+#choices button{display:block;width:100%;margin:8px 0;padding:12px;border:none;border-radius:8px;background:#1565c0;color:white;cursor:pointer}
+.badge{display:inline-block;background:#eee;color:#111;padding:6px 10px;border-radius:20px;margin:4px}
+.start{text-align:center;padding:40px}
+input{padding:10px}
 </style>
 </head>
-
 <body>
-
-<div id="game">
-
-<div id="background">
-
-<div class="characters">
-
-<div class="character">
-<img src="https://cdn-icons-png.flaticon.com/512/4140/4140048.png">
-</div>
-
-<div class="character">
-<img src="https://cdn-icons-png.flaticon.com/512/1946/1946429.png">
-</div>
-
-</div>
-
-</div>
-
-<div id="hud">
-
-<div class="progress">
-<div id="progressBar"></div>
-</div>
-
-<div class="stats">
-<div>💰 €<span id="geld">200</span></div>
-<div>😊 <span id="geluk">50</span></div>
-<div>💳 <span id="schuld">0</span></div>
-<div>🧠 <span id="bewust">50</span></div>
-</div>
-
-<div id="story"></div>
-<div id="choices"></div>
-
-</div>
-
-</div>
-
+<div id="bg"></div><div id="overlay"></div>
+<div id="game"><div id="app"></div></div>
 <script>
+const boy="https://cdn-icons-png.flaticon.com/512/4140/4140048.png";
+const girl="https://cdn-icons-png.flaticon.com/512/6997/6997662.png";
+let avatar=boy,name="Speler",money=250,happy=50,debt=0,aware=50,badges=[],i=0;
 
-let spelerNaam = prompt("Wat is jouw naam?") || "Speler";
-
-let geld = 200;
-let geluk = 50;
-let schuld = 0;
-let bewust = 50;
-
-let scene = 0;
-
-const scenes = [
-
-{
-bg:"https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1600",
-story:`
-<h2>Welkom ${spelerNaam}!</h2>
-<p>Je begint de week met €200 spaargeld.</p>
-<p>Je vriend Noah heeft net nieuwe merkschoenen gekocht.</p>
-<p>"Iedereen heeft deze schoenen!" zegt hij.</p>
-`,
-choices:[
-{
-text:"🔥 Koop merkschoenen (€120)",
-effect:()=>{
-geld-=120;
-geluk+=10;
-bewust-=15;
-}
-},
-{
-text:"👍 Koop goedkoper alternatief (€50)",
-effect:()=>{
-geld-=50;
-bewust+=10;
-}
-},
-{
-text:"🧠 Koop niets",
-effect:()=>{
-bewust+=15;
-}
-}
-]
-},
-
-{
-bg:"https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1600",
-story:`
-<h2>Influencer Alert</h2>
-<p>Een bekende influencer promoot een nieuwe smartphone.</p>
-<p>Je huidige telefoon werkt nog prima.</p>
-`,
-choices:[
-{
-text:"📱 Direct kopen (€180)",
-effect:()=>{
-geld-=180;
-bewust-=20;
-geluk+=10;
-}
-},
-{
-text:"🔍 Eerst vergelijken",
-effect:()=>{
-bewust+=15;
-}
-},
-{
-text:"❌ Niet nodig",
-effect:()=>{
-bewust+=20;
-}
-}
-]
-},
-
-{
-bg:"https://images.unsplash.com/photo-1550547660-d9450f859349?w=1600",
-story:`
-<h2>Fastfood met vrienden</h2>
-<p>Je vrienden gaan na school eten halen.</p>
-`,
-choices:[
-{
-text:"🍔 Mee eten (€15)",
-effect:()=>{
-geld-=15;
-geluk+=10;
-}
-},
-{
-text:"🥪 Eigen lunch meenemen",
-effect:()=>{
-bewust+=10;
-}
-},
-{
-text:"🍟 Grote menu deal (€25)",
-effect:()=>{
-geld-=25;
-geluk+=15;
-bewust-=10;
-}
-}
-]
-},
-
-{
-bg:"https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1600",
-story:`
-<h2>Grote Online Sale</h2>
-<p>Je ziet 50% korting op allerlei producten.</p>
-`,
-choices:[
-{
-text:"🛒 Veel spullen kopen (€80)",
-effect:()=>{
-geld-=80;
-bewust-=15;
-}
-},
-{
-text:"🎯 Alleen wat je nodig hebt (€20)",
-effect:()=>{
-geld-=20;
-bewust+=10;
-}
-},
-{
-text:"❌ Niets kopen",
-effect:()=>{
-bewust+=15;
-}
-}
-]
-},
-
-{
-bg:"https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=1600",
-story:`
-<h2>Streamingdiensten</h2>
-<p>Je wilt Netflix én Spotify.</p>
-`,
-choices:[
-{
-text:"📺 Beide abonnementen",
-effect:()=>{
-geld-=25;
-geluk+=10;
-}
-},
-{
-text:"🎵 Alleen Spotify",
-effect:()=>{
-geld-=10;
-bewust+=5;
-}
-},
-{
-text:"❌ Geen abonnement",
-effect:()=>{
-bewust+=10;
-}
-}
-]
-},
-
-{
-bg:"https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1600",
-story:`
-<h2>Schoolreis</h2>
-<p>Je krijgt €30 zakgeld mee.</p>
-`,
-choices:[
-{
-text:"💸 Alles uitgeven",
-effect:()=>{
-geld-=30;
-bewust-=10;
-}
-},
-{
-text:"⚖️ Helft uitgeven",
-effect:()=>{
-geld-=15;
-bewust+=10;
-}
-},
-{
-text:"💰 Bijna alles bewaren",
-effect:()=>{
-bewust+=15;
-}
-}
-]
-},
-
-{
-bg:"https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=1600",
-story:`
-<h2>Nieuwe Game Release</h2>
-<p>Iedereen speelt de nieuwste game.</p>
-`,
-choices:[
-{
-text:"🎮 Meteen kopen (€60)",
-effect:()=>{
-geld-=60;
-geluk+=15;
-}
-},
-{
-text:"⏳ Wachten op korting",
-effect:()=>{
-bewust+=15;
-}
-},
-{
-text:"👀 Reviews bekijken",
-effect:()=>{
-bewust+=10;
-}
-}
-]
-},
-
-{
-bg:"https://images.unsplash.com/photo-1556740749-887f6717d7e4?w=1600",
-story:`
-<h2>Je geld raakt op</h2>
-<p>Je wilt nog iets kopen maar je saldo wordt laag.</p>
-`,
-choices:[
-{
-text:"💳 Geld lenen",
-effect:()=>{
-schuld+=100;
-}
-},
-{
-text:"📉 Budget maken",
-effect:()=>{
-bewust+=20;
-}
-},
-{
-text:"❌ Aankoop uitstellen",
-effect:()=>{
-bewust+=15;
-}
-}
-]
-}
-
+const scenes=[
+{bg:"https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1600",title:"Winkelcentrum",npc:"Noah",text:"Iedereen koopt nieuwe sneakers.",c:[["Koop merk €120",()=>{money-=120;aware-=15}],["Goedkoper €50",()=>{money-=50;aware+=10}],["Niet kopen",()=>{aware+=15;badge('Kritische Denker')}]]},
+{bg:"https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1600",title:"Influencer",npc:"Liv",text:"Een influencer promoot een telefoon.",c:[["Direct kopen",()=>{money-=180;aware-=20}],["Reviews lezen",()=>{aware+=15}],["Overslaan",()=>{aware+=20}]]},
+{bg:"https://images.unsplash.com/photo-1550547660-d9450f859349?w=1600",title:"Fastfood",npc:"Vrienden",text:"Ga je mee eten?",c:[["Ja €15",()=>{money-=15;happy+=10}],["Eigen lunch",()=>{aware+=10}],["Grote deal €25",()=>{money-=25;happy+=15;aware-=10}]]},
+{bg:"https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1600",title:"Sale",npc:"Advertentie",text:"50% korting!",c:[["Veel kopen",()=>{money-=80;aware-=15}],["Alleen nodig",()=>{money-=20;aware+=10}],["Niets",()=>{aware+=15}]]},
+{bg:"https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=1600",title:"Streaming",npc:"Thuis",text:"Welke abonnementen neem je?",c:[["Alles",()=>{money-=25}],["1 abonnement",()=>{money-=10;aware+=5}],["Geen",()=>{aware+=10}]]},
+{bg:"https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1600",title:"Schoolreis",npc:"Docent",text:"Je krijgt zakgeld.",c:[["Alles uitgeven",()=>{money-=30}],["Deels sparen",()=>{money-=15;aware+=10}],["Bewaren",()=>{aware+=15}]]},
+{bg:"https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=1600",title:"Nieuwe Game",npc:"Klasgenoot",text:"Iedereen speelt hem.",c:[["Direct kopen",()=>{money-=60}],["Wachten",()=>{aware+=15}],["Reviews",()=>{aware+=10}]]},
+{bg:"https://images.unsplash.com/photo-1556740749-887f6717d7e4?w=1600",title:"Budget",npc:"Ouder",text:"Je saldo wordt laag.",c:[["Lenen",()=>{debt+=100;badge('Lener')}],["Budget maken",()=>{aware+=20;badge('Budgetbaas')}],["Uitstellen",()=>{aware+=15}]]},
+{bg:"https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1600",title:"Groepsproject",npc:"Team",text:"Koop je dure materialen?",c:[["Ja",()=>{money-=40}],["Vergelijk prijzen",()=>{aware+=10}],["Leen materialen",()=>{aware+=15}]]},
+{bg:"https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?w=1600",title:"Festival",npc:"Vriend",text:"Koop je VIP tickets?",c:[["VIP",()=>{money-=90;happy+=20}],["Normaal",()=>{money-=35}],["Niet gaan",()=>{aware+=5}]]},
+{bg:"https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=1600",title:"Online cursus",npc:"Mentor",text:"Investeren in jezelf?",c:[["Ja €30",()=>{money-=30;aware+=20;badge('Zelfontwikkelaar')}],["Nee",()=>{}],["Gratis alternatief",()=>{aware+=10}]]},
+{bg:"https://images.unsplash.com/photo-1460317442991-0ec209397118?w=1600",title:"Einde week",npc:"Reflectie",text:"Kijk terug op je keuzes.",c:[["Reflecteren",()=>{aware+=10}],["Verder",()=>{}],["Budget check",()=>{aware+=15}]]}
 ];
 
-function updateStats(){
-document.getElementById("geld").innerText = geld;
-document.getElementById("geluk").innerText = geluk;
-document.getElementById("schuld").innerText = schuld;
-document.getElementById("bewust").innerText = bewust;
-
-let progress = (scene/scenes.length)*100;
-document.getElementById("progressBar").style.width = progress+"%";
+function beep(){
+ const a=new(window.AudioContext||window.webkitAudioContext)();
+ const o=a.createOscillator(); const g=a.createGain();
+ o.connect(g); g.connect(a.destination); o.start();
+ g.gain.setValueAtTime(.05,a.currentTime);
+ g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.15);
+ o.stop(a.currentTime+.15);
 }
-
-function loadScene(){
-
-if(scene >= scenes.length){
-showEnding();
-return;
+function speak(t){if(speechSynthesis){speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(t));}}
+function badge(b){if(!badges.includes(b))badges.push(b);}
+function start(){
+app.innerHTML=`<div class="start panel"><h1>Consumptie Quest Deluxe</h1>
+<p>Naam:</p><input id=n><br><br>
+<button onclick="pick('boy')">👦 Jongen</button>
+<button onclick="pick('girl')">👧 Meisje</button></div>`
 }
-
-const current = scenes[scene];
-
-document.getElementById("background").style.backgroundImage =
-`url('${current.bg}')`;
-
-document.getElementById("story").innerHTML =
-current.story;
-
-let html = "";
-
-current.choices.forEach((choice,index)=>{
-
-html += `
-<button onclick="choose(${index})">
-${choice.text}
-</button>
-`;
-
-});
-
-document.getElementById("choices").innerHTML = html;
-
-updateStats();
+function pick(g){name=document.getElementById('n').value||'Speler';avatar=g==='boy'?boy:girl;render();}
+function hud(){return `<div class='top'><div class='stats'>💰€${money} 😊${happy} 💳${debt} 🧠${aware}</div><div class='progress'><div class='bar' style='width:${i/scenes.length*100}%'></div></div></div>`}
+function render(){
+ if(i>=scenes.length)return end();
+ let s=scenes[i];
+ bg.style.backgroundImage=`url(${s.bg})`;
+ app.innerHTML=hud()+`<div class='main'><img class='char' src='${avatar}'><div class='panel'><h2>${s.title}</h2><p><b>${s.npc}:</b> ${s.text}</p><button onclick="speakScene()">🔊 Voorlezen</button><div id='choices'></div></div><img class='char' src='${girl}'></div>`;
+ let c=document.getElementById('choices');
+ s.c.forEach(x=>{let b=document.createElement('button');b.textContent=x[0];b.onclick=()=>{beep();x[1]();i++;render();};c.appendChild(b);});
 }
-
-function choose(index){
-
-scenes[scene].choices[index].effect();
-
-scene++;
-
-loadScene();
+function speakScene(){speak(scenes[i].text);}
+function end(){
+ let type="Gemiddelde Consument",tips="<li>Denk na voor je koopt.</li>";
+ if(debt>=100){type="Impulsieve Koper";tips="<li>Maak een budget.</li><li>Leen minder.</li>";}
+ else if(aware>=130){type="Bewuste Consument";tips="<li>Ga zo door.</li>";}
+ else if(money>=180){type="Spaarder";tips="<li>Gebruik spaargeld doelgericht.</li>";}
+ if(aware>=120) badge("Bewuste Keuze");
+ if(money>=200) badge("Topspaarder");
+ app.innerHTML=`<div class='panel'><h1>🏆 Eindrapport</h1>
+ <h2>${name} - ${type}</h2>
+ <p>💰 €${money} | 😊 ${happy} | 💳 ${debt} | 🧠 ${aware}</p>
+ <h3>Badges</h3>${badges.map(b=>`<span class='badge'>${b}</span>`).join('')||'Geen'}
+ <h3>Tips</h3><ul>${tips}</ul>
+ <button onclick='location.reload()'>Opnieuw spelen</button></div>`;
 }
-
-function showEnding(){
-
-let type = "";
-let uitleg = "";
-let tips = "";
-
-if(schuld >= 100){
-
-type = "💳 Impulsieve Koper";
-
-uitleg =
-"Je laat je vaak leiden door reclame, trends en directe wensen.";
-
-tips = `
-<ul>
-<li>Maak een budget.</li>
-<li>Vergelijk prijzen.</li>
-<li>Wacht 24 uur voor grote aankopen.</li>
-</ul>
-`;
-
-}
-else if(bewust >= 100){
-
-type = "🧠 Bewuste Consument";
-
-uitleg =
-"Je denkt goed na over geld, duurzaamheid en noodzaak.";
-
-tips = `
-<ul>
-<li>Blijf sparen voor doelen.</li>
-<li>Blijf kritisch op reclame.</li>
-<li>Koop alleen wat waarde toevoegt.</li>
-</ul>
-`;
-
-}
-else{
-
-type = "🙂 Gemiddelde Consument";
-
-uitleg =
-"Je maakt vaak verstandige keuzes maar laat je soms beïnvloeden.";
-
-tips = `
-<ul>
-<li>Denk na voor je koopt.</li>
-<li>Maak een spaardoel.</li>
-<li>Controleer aanbiedingen kritisch.</li>
-</ul>
-`;
-
-}
-
-document.getElementById("story").innerHTML = `
-<div class="result">
-
-<h1>🏁 Einde van het verhaal</h1>
-
-<h2>${spelerNaam}, jij bent een:</h2>
-
-<h1>${type}</h1>
-
-<p>${uitleg}</p>
-
-<h3>Eindscore</h3>
-
-<p>
-💰 Geld: €${geld}<br>
-😊 Geluk: ${geluk}<br>
-💳 Schulden: ${schuld}<br>
-🧠 Bewust-score: ${bewust}
-</p>
-
-<h3>Verbeterpunten</h3>
-
-${tips}
-
-</div>
-`;
-
-document.getElementById("choices").innerHTML = `
-<button onclick="location.reload()">
-🔄 Opnieuw spelen
-</button>
-`;
-
-updateStats();
-}
-
-loadScene();
-
+start();
 </script>
-
 </body>
 </html>
