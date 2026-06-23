@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<title>Consumenten Game</title>
+
+<style>
+body { font-family: Arial; text-align: center; background:#f4f6f8; }
+.container { max-width:600px; margin:auto; padding:20px; background:white; border-radius:10px; }
+button {
+  padding:10px;
+  margin:10px;
+  border:none;
+  background:#0078d4;
+  color:white;
+  border-radius:8px;
+  cursor:pointer;
+}
+button:hover { background:#005fa3; }
+
+.score {
+  margin:10px;
+  font-weight:bold;
+}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+  <h2>🎮 Jouw leven als consument</h2>
+
+  <p id="tekst">Je bent 16 jaar en hebt €100. Wat ga je doen?</p>
+
+  <div id="keuzes"></div>
+
+  <div class="score">
+    💰 Geld: <span id="geld">100</span><br>
+    😊 Geluk: <span id="geluk">50</span><br>
+    🌍 Duurzaam: <span id="duurzaam">50</span>
+  </div>
+</div>
+
+<script>
+let geld = 100;
+let geluk = 50;
+let duurzaam = 50;
+
+function update() {
+  document.getElementById("geld").innerText = geld;
+  document.getElementById("geluk").innerText = geluk;
+  document.getElementById("duurzaam").innerText = duurzaam;
+}
+
+function start() {
+  document.getElementById("tekst").innerHTML =
+  "Je loopt het winkelcentrum in. Waar ga je heen?";
+
+  document.getElementById("keuzes").innerHTML = `
+    <button onclick="kleding()">👕 Kleding</button>
+    <button onclick="telefoon()">📱 Telefoon</button>
+    <button onclick="eten()">🍔 Eten</button>
+  `;
+}
+
+function kleding() {
+  document.getElementById("tekst").innerHTML =
+  "🔥 Influencer: 'Deze hoodie moet je hebben!'<br>👀 Je vrienden kijken mee";
+
+  document.getElementById("keuzes").innerHTML = `
+    <button onclick="duurHoodie()">€80 merk</button>
+    <button onclick="goedkoop()">€30 hoodie</button>
+  `;
+}
+
+function duurHoodie() {
+  geld -= 80;
+  geluk += 20;
+  duurzaam -= 10;
+
+  resultaat("😎 Je bent populair, maar bijna geen geld meer");
+}
+
+function goedkoop() {
+  geld -= 30;
+  duurzaam += 5;
+
+  resultaat("😅 Vrienden lachen je een beetje uit, maar slim gekozen");
+}
+
+function telefoon() {
+  document.getElementById("tekst").innerHTML =
+  "📢 Influencer: 'Nieuwe iPhone = succes!'<br>Je oude werkt nog";
+
+  document.getElementById("keuzes").innerHTML = `
+    <button onclick="koop()">Nieuwe telefoon (€100)</button>
+    <button onclick="hou()">Niet kopen</button>
+  `;
+}
+
+function koop() {
+  geld -= 100;
+  geluk += 25;
+  duurzaam -= 20;
+
+  einde();
+}
+
+function hou() {
+  duurzaam += 15;
+  resultaat("💪 Slim! Je laat je niet beïnvloeden");
+}
+
+function eten() {
+  document.getElementById("tekst").innerHTML =
+  "🍔 Je vrienden willen fastfood";
+
+  document.getElementById("keuzes").innerHTML = `
+    <button onclick="fastfood()">Fastfood (€15)</button>
+    <button onclick="gezond()">Gezond (€10)</button>
+  `;
+}
+
+function fastfood() {
+  geld -= 15;
+  geluk += 10;
+  duurzaam -= 5;
+
+  einde();
+}
+
+function gezond() {
+  geld -= 10;
+  duurzaam += 10;
+
+  einde();
+}
+
+function resultaat(tekst) {
+  update();
+  document.getElementById("tekst").innerHTML = tekst;
+
+  document.getElementById("keuzes").innerHTML = `
+    <button onclick="eten()">➡️ Ga verder</button>
+  `;
+}
+
+function einde() {
+  update();
+
+  let type = "";
+
+  if (geld <= 0) {
+    type = "💸 Impulsieve koper";
+  } else if (duurzaam > 60) {
+    type = "🌍 Duurzame consument";
+  } else {
+    type = "🧠 Slimme consument";
+  }
+
+  document.getElementById("tekst").innerHTML =
+  "Einde van je keuzes!";
+
+  document.getElementById("keuzes").innerHTML = `
+    <h3>${type}</h3>
+    <button onclick="herstart()">🔄 Opnieuw</button>
+  `;
+}
+
+function herstart() {
+  geld = 100;
+  geluk = 50;
+  duurzaam = 50;
+  update();
+  start();
+}
+
+start();
+</script>
+
+</body>
+</html>
