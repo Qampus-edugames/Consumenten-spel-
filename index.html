@@ -5,176 +5,180 @@
 <title>Consumenten Game</title>
 
 <style>
-body { font-family: Arial; text-align: center; background:#f4f6f8; }
-.container { max-width:600px; margin:auto; padding:20px; background:white; border-radius:10px; }
-button {
-  padding:10px;
-  margin:10px;
-  border:none;
-  background:#0078d4;
-  color:white;
-  border-radius:8px;
-  cursor:pointer;
-}
-button:hover { background:#005fa3; }
-
-.score {
-  margin:10px;
-  font-weight:bold;
-}
+body { font-family: Arial; text-align:center; background:#f4f6f8;}
+.box { background:white; margin:auto; padding:20px; max-width:600px; border-radius:10px;}
+button { padding:10px; margin:10px; border:none; border-radius:8px; background:#0078d4; color:white;}
+button:hover { background:#005fa3;}
+.score { margin-top:10px; font-weight:bold;}
 </style>
 
 </head>
 <body>
 
-<div class="container">
-  <h2>🎮 Jouw leven als consument</h2>
+<div class="box">
+<h2>🎮 Jouw leven als consument</h2>
+<p id="tekst"></p>
+<div id="keuzes"></div>
 
-  <p id="tekst">Je bent 16 jaar en hebt €100. Wat ga je doen?</p>
-
-  <div id="keuzes"></div>
-
-  <div class="score">
-    💰 Geld: <span id="geld">100</span><br>
-    😊 Geluk: <span id="geluk">50</span><br>
-    🌍 Duurzaam: <span id="duurzaam">50</span>
-  </div>
+<div class="score">
+💰 Geld: <span id="geld">100</span> |
+😊 Geluk: <span id="geluk">50</span> |
+📉 Schuld: <span id="schuld">0</span>
+</div>
 </div>
 
 <script>
-let geld = 100;
-let geluk = 50;
-let duurzaam = 50;
+let geld=100;
+let geluk=50;
+let schuld=0;
+let dag=1;
 
-function update() {
-  document.getElementById("geld").innerText = geld;
-  document.getElementById("geluk").innerText = geluk;
-  document.getElementById("duurzaam").innerText = duurzaam;
+function update(){
+document.getElementById("geld").innerText=geld;
+document.getElementById("geluk").innerText=geluk;
+document.getElementById("schuld").innerText=schuld;
 }
 
-function start() {
-  document.getElementById("tekst").innerHTML =
-  "Je loopt het winkelcentrum in. Waar ga je heen?";
-
-  document.getElementById("keuzes").innerHTML = `
-    <button onclick="kleding()">👕 Kleding</button>
-    <button onclick="telefoon()">📱 Telefoon</button>
-    <button onclick="eten()">🍔 Eten</button>
-  `;
+function start(){
+dag1();
 }
 
-function kleding() {
-  document.getElementById("tekst").innerHTML =
-  "🔥 Influencer: 'Deze hoodie moet je hebben!'<br>👀 Je vrienden kijken mee";
+function dag1(){
+document.getElementById("tekst").innerHTML =
+"📅 Dag 1: Je krijgt €100. Wat doe je?";
 
-  document.getElementById("keuzes").innerHTML = `
-    <button onclick="duurHoodie()">€80 merk</button>
-    <button onclick="goedkoop()">€30 hoodie</button>
-  `;
+document.getElementById("keuzes").innerHTML=`
+<button onclick="duurkleding()">👕 Merk (€80)</button>
+<button onclick="goedkoop()">👕 Goedkoop (€30)</button>
+`;
 }
 
-function duurHoodie() {
-  geld -= 80;
-  geluk += 20;
-  duurzaam -= 10;
-
-  resultaat("😎 Je bent populair, maar bijna geen geld meer");
+function duurkleding(){
+geld-=80; geluk+=20;
+volgendeDag("😎 Je ziet er goed uit!");
 }
 
-function goedkoop() {
-  geld -= 30;
-  duurzaam += 5;
-
-  resultaat("😅 Vrienden lachen je een beetje uit, maar slim gekozen");
+function goedkoop(){
+geld-=30;
+volgendeDag("🧠 Slim, je bespaart geld");
 }
 
-function telefoon() {
-  document.getElementById("tekst").innerHTML =
-  "📢 Influencer: 'Nieuwe iPhone = succes!'<br>Je oude werkt nog";
+function dag2(){
+document.getElementById("tekst").innerHTML =
+"📅 Dag 2: Nieuwe telefoon hype! Influencer zegt: kopen!";
 
-  document.getElementById("keuzes").innerHTML = `
-    <button onclick="koop()">Nieuwe telefoon (€100)</button>
-    <button onclick="hou()">Niet kopen</button>
-  `;
+document.getElementById("keuzes").innerHTML=`
+<button onclick="koopTelefoon()">📱 Kopen (€100)</button>
+<button onclick="leen()">💳 Lenen</button>
+<button onclick="nietKopen()">❌ Niet kopen</button>
+`;
 }
 
-function koop() {
-  geld -= 100;
-  geluk += 25;
-  duurzaam -= 20;
-
-  einde();
+function koopTelefoon(){
+geld-=100;
+geluk+=25;
+volgendeDag("🔥 Je hebt de nieuwste!");
 }
 
-function hou() {
-  duurzaam += 15;
-  resultaat("💪 Slim! Je laat je niet beïnvloeden");
+function leen(){
+schuld+=100;
+geluk+=30;
+volgendeDag("⚠️ Je hebt iets, maar nu schuld!");
 }
 
-function eten() {
-  document.getElementById("tekst").innerHTML =
-  "🍔 Je vrienden willen fastfood";
-
-  document.getElementById("keuzes").innerHTML = `
-    <button onclick="fastfood()">Fastfood (€15)</button>
-    <button onclick="gezond()">Gezond (€10)</button>
-  `;
+function nietKopen(){
+geluk-=5;
+volgendeDag("💪 Je maakt je eigen keuze");
 }
 
-function fastfood() {
-  geld -= 15;
-  geluk += 10;
-  duurzaam -= 5;
+function dag3(){
+document.getElementById("tekst").innerHTML =
+"📅 Dag 3: Abonnementen... Je vrienden hebben alles!";
 
-  einde();
+document.getElementById("keuzes").innerHTML=`
+<button onclick="abbo()">📺 Netflix (€15)</button>
+<button onclick="skipAbbo()">❌ Geen abonnement</button>
+`;
 }
 
-function gezond() {
-  geld -= 10;
-  duurzaam += 10;
-
-  einde();
+function abbo(){
+geld-=15;
+geluk+=10;
+volgendeDag("😄 Gezellig met series");
 }
 
-function resultaat(tekst) {
-  update();
-  document.getElementById("tekst").innerHTML = tekst;
-
-  document.getElementById("keuzes").innerHTML = `
-    <button onclick="eten()">➡️ Ga verder</button>
-  `;
+function skipAbbo(){
+geluk-=5;
+volgendeDag("😅 Je bent zuinig");
 }
 
-function einde() {
-  update();
+function dag4(){
+document.getElementById("tekst").innerHTML =
+"📅 Dag 4: Je hebt honger, vrienden willen fastfood";
 
-  let type = "";
-
-  if (geld <= 0) {
-    type = "💸 Impulsieve koper";
-  } else if (duurzaam > 60) {
-    type = "🌍 Duurzame consument";
-  } else {
-    type = "🧠 Slimme consument";
-  }
-
-  document.getElementById("tekst").innerHTML =
-  "Einde van je keuzes!";
-
-  document.getElementById("keuzes").innerHTML = `
-    <h3>${type}</h3>
-    <button onclick="herstart()">🔄 Opnieuw</button>
-  `;
+document.getElementById("keuzes").innerHTML=`
+<button onclick="fastfood()">🍔 Fastfood (€15)</button>
+<button onclick="gezond()">🥗 Gezond (€10)</button>
+`;
 }
 
-function herstart() {
-  geld = 100;
-  geluk = 50;
-  duurzaam = 50;
-  update();
-  start();
+function fastfood(){
+geld-=15;
+geluk+=10;
+einde();
 }
 
+function gezond(){
+geld-=10;
+geluk+=5;
+einde();
+}
+
+function volgendeDag(tekst){
+update();
+document.getElementById("tekst").innerHTML = tekst;
+
+document.getElementById("keuzes").innerHTML=`
+<button onclick="gaVerder()">➡️ Volgende dag</button>
+`;
+}
+
+function gaVerder(){
+dag++;
+if(dag==2) dag2();
+if(dag==3) dag3();
+if(dag==4) dag4();
+}
+
+function einde(){
+update();
+
+let resultaat="";
+if(schuld>0){
+resultaat="⚠️ Je hebt schulden. Let op je keuzes!";
+}
+else if(geld<20){
+resultaat="💸 Je hebt weinig geld over.";
+}
+else{
+resultaat="🧠 Jij bent een slimme consument!";
+}
+
+document.getElementById("tekst").innerHTML="🏁 Einde van het spel";
+
+document.getElementById("keuzes").innerHTML=`
+<h3>${resultaat}</h3>
+<button onclick="reset()">🔄 Opnieuw</button>
+`;
+}
+
+function reset(){
+geld=100; geluk=50; schuld=0; dag=1;
+update();
+start();
+}
+
+update();
 start();
 </script>
 
