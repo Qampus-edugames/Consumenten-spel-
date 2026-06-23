@@ -2,184 +2,276 @@
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
-<title>Consumenten Game</title>
+<title>Consumptie Story Game</title>
 
 <style>
-body { font-family: Arial; text-align:center; background:#f4f6f8;}
-.box { background:white; margin:auto; padding:20px; max-width:600px; border-radius:10px;}
-button { padding:10px; margin:10px; border:none; border-radius:8px; background:#0078d4; color:white;}
-button:hover { background:#005fa3;}
-.score { margin-top:10px; font-weight:bold;}
+body {
+  margin:0;
+  font-family: Arial;
+  background:#87ceeb;
+  overflow:hidden;
+}
+
+/* === GAME SCHERM === */
+#game {
+  width:100vw;
+  height:100vh;
+  position:relative;
+}
+
+/* === ACHTERGROND === */
+.background {
+  position:absolute;
+  width:100%;
+  height:100%;
+  background-size:cover;
+  transition:1s;
+}
+
+/* === PERSONAGE === */
+#player {
+  position:absolute;
+  bottom:20px;
+  left:50px;
+  width:80px;
+  animation: bounce 1s infinite alternate;
+}
+
+@keyframes bounce {
+  from { transform:translateY(0px);}
+  to { transform:translateY(-10px);}
+}
+
+/* === GAME BOX === */
+.ui {
+  position:absolute;
+  bottom:0;
+  width:100%;
+  background:rgba(255,255,255,0.95);
+  padding:15px;
+  text-align:center;
+}
+
+/* === KNOPPEN === */
+button {
+  margin:5px;
+  padding:10px;
+  border:none;
+  border-radius:8px;
+  background:#0078d4;
+  color:white;
+  font-size:14px;
+}
+button:hover { background:#005fa3; }
+
+/* === SCORE === */
+.score {
+  font-weight:bold;
+  margin-bottom:5px;
+}
+
 </style>
 
 </head>
+
 <body>
 
-<div class="box">
-<h2>🎮 Jouw leven als consument</h2>
-<p id="tekst"></p>
-<div id="keuzes"></div>
+<div id="game">
 
-<div class="score">
-💰 Geld: <span id="geld">100</span> |
-😊 Geluk: <span id="geluk">50</span> |
-📉 Schuld: <span id="schuld">0</span>
-</div>
+  <div id="bg" class="background"></div>
+
+  <img id="player" src="https://cdn-icons-png.flaticon.com/512/1946/1946429.png">
+
+  <div class="ui">
+    <div class="score">
+      💰 <span id="geld">100</span> |
+      😊 <span id="geluk">50</span> |
+      📉 <span id="schuld">0</span>
+    </div>
+
+    <p id="tekst"></p>
+    <div id="keuzes"></div>
+  </div>
+
 </div>
 
 <script>
+
 let geld=100;
 let geluk=50;
 let schuld=0;
 let dag=1;
 
 function update(){
-document.getElementById("geld").innerText=geld;
-document.getElementById("geluk").innerText=geluk;
-document.getElementById("schuld").innerText=schuld;
+  document.getElementById("geld").innerText=geld;
+  document.getElementById("geluk").innerText=geluk;
+  document.getElementById("schuld").innerText=schuld;
 }
 
-function start(){
-dag1();
+/* === ACHTERGRONDEN === */
+function setBG(type){
+  let bg = document.getElementById("bg");
+
+  if(type=="mall"){
+    bg.style.backgroundImage="url('https://images.unsplash.com/photo-1515169067865-5387ec356754?auto=format&fit=crop&w=1500&q=80')";
+  }
+  if(type=="phone"){
+    bg.style.backgroundImage="url('https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1500&q=80')";
+  }
+  if(type=="home"){
+    bg.style.backgroundImage="url('https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1500&q=80')";
+  }
+  if(type=="fastfood"){
+    bg.style.backgroundImage="url('https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=1500&q=80')";
+  }
 }
 
-function dag1(){
-document.getElementById("tekst").innerHTML =
-"📅 Dag 1: Je krijgt €100. Wat doe je?";
+/* === GAME LOGICA === */
 
-document.getElementById("keuzes").innerHTML=`
-<button onclick="duurkleding()">👕 Merk (€80)</button>
-<button onclick="goedkoop()">👕 Goedkoop (€30)</button>
-`;
-}
+function level(){
 
-function duurkleding(){
-geld-=80; geluk+=20;
-volgendeDag("😎 Je ziet er goed uit!");
-}
-
-function goedkoop(){
-geld-=30;
-volgendeDag("🧠 Slim, je bespaart geld");
-}
-
-function dag2(){
-document.getElementById("tekst").innerHTML =
-"📅 Dag 2: Nieuwe telefoon hype! Influencer zegt: kopen!";
-
-document.getElementById("keuzes").innerHTML=`
-<button onclick="koopTelefoon()">📱 Kopen (€100)</button>
-<button onclick="leen()">💳 Lenen</button>
-<button onclick="nietKopen()">❌ Niet kopen</button>
-`;
-}
-
-function koopTelefoon(){
-geld-=100;
-geluk+=25;
-volgendeDag("🔥 Je hebt de nieuwste!");
-}
-
-function leen(){
-schuld+=100;
-geluk+=30;
-volgendeDag("⚠️ Je hebt iets, maar nu schuld!");
-}
-
-function nietKopen(){
-geluk-=5;
-volgendeDag("💪 Je maakt je eigen keuze");
-}
-
-function dag3(){
-document.getElementById("tekst").innerHTML =
-"📅 Dag 3: Abonnementen... Je vrienden hebben alles!";
-
-document.getElementById("keuzes").innerHTML=`
-<button onclick="abbo()">📺 Netflix (€15)</button>
-<button onclick="skipAbbo()">❌ Geen abonnement</button>
-`;
-}
-
-function abbo(){
-geld-=15;
-geluk+=10;
-volgendeDag("😄 Gezellig met series");
-}
-
-function skipAbbo(){
-geluk-=5;
-volgendeDag("😅 Je bent zuinig");
-}
-
-function dag4(){
-document.getElementById("tekst").innerHTML =
-"📅 Dag 4: Je hebt honger, vrienden willen fastfood";
-
-document.getElementById("keuzes").innerHTML=`
-<button onclick="fastfood()">🍔 Fastfood (€15)</button>
-<button onclick="gezond()">🥗 Gezond (€10)</button>
-`;
-}
-
-function fastfood(){
-geld-=15;
-geluk+=10;
-einde();
-}
-
-function gezond(){
-geld-=10;
-geluk+=5;
-einde();
-}
-
-function volgendeDag(tekst){
 update();
-document.getElementById("tekst").innerHTML = tekst;
 
-document.getElementById("keuzes").innerHTML=`
-<button onclick="gaVerder()">➡️ Volgende dag</button>
-`;
+/* DAGEN */
+if(dag==1){
+setBG("mall");
+tekst("Dag 1: Je gaat shoppen 🛍️");
+keuzes(`
+<button onclick="next(()=>{geld-=80; geluk+=20})">👕 Merk €80</button>
+<button onclick="next(()=>{geld-=30})">👕 Goedkoop €30</button>
+`);
 }
 
-function gaVerder(){
+if(dag==2){
+setBG("phone");
+tekst("Dag 2: Influencer zegt: koop telefoon!");
+keuzes(`
+<button onclick="next(()=>{geld-=100})">📱 Koop</button>
+<button onclick="next(()=>{schuld+=100})">💳 Leen</button>
+<button onclick="next(()=>{})">❌ Niet</button>
+`);
+}
+
+if(dag==3){
+setBG("home");
+tekst("Dag 3: Spotify abonnement?");
+keuzes(`
+<button onclick="next(()=>{geld-=10; geluk+=5})">🎵 Ja</button>
+<button onclick="next(()=>{})">❌ Nee</button>
+`);
+}
+
+if(dag==4){
+setBG("home");
+tekst("Dag 4: Netflix abonnement?");
+keuzes(`
+<button onclick="next(()=>{geld-=15})">📺 Ja</button>
+<button onclick="next(()=>{})">❌ Nee</button>
+`);
+}
+
+if(dag==5){
+setBG("mall");
+tekst("Dag 5: SALE!");
+keuzes(`
+<button onclick="next(()=>{geld-=50})">🛍️ Kopen</button>
+<button onclick="next(()=>{})">❌ Niet nodig</button>
+`);
+}
+
+if(dag==6){
+setBG("fastfood");
+tekst("Dag 6: Vrienden willen fastfood");
+keuzes(`
+<button onclick="next(()=>{geld-=15; geluk+=10})">🍔 Mee</button>
+<button onclick="next(()=>{})">❌ Thuis</button>
+`);
+}
+
+if(dag==7){
+setBG("mall");
+tekst("Dag 7: Nieuwe game!");
+keuzes(`
+<button onclick="next(()=>{geld-=60})">🎮 Kopen</button>
+<button onclick="next(()=>{})">❌ Wachten</button>
+`);
+}
+
+if(dag==8){
+setBG("home");
+tekst("Dag 8: Geld bijna op...");
+keuzes(`
+<button onclick="next(()=>{schuld+=50})">💳 Lenen</button>
+<button onclick="next(()=>{})">❌ Niet</button>
+`);
+}
+
+if(dag==9){
+setBG("home");
+tekst("Dag 9: Abonnement loopt door!");
+keuzes(`
+<button onclick="next(()=>{geld-=15})">📺 Betalen</button>
+<button onclick="next(()=>{})">❌ Stoppen</button>
+`);
+}
+
+if(dag==10){
+einde();
+}
+
+}
+
+function tekst(t){
+document.getElementById("tekst").innerHTML=t;
+}
+
+function keuzes(k){
+document.getElementById("keuzes").innerHTML=k;
+}
+
+function next(effect){
+effect();
+
+/* BEWEGING */
+let player = document.getElementById("player");
+player.style.left = Math.random()*300+"px";
+
 dag++;
-if(dag==2) dag2();
-if(dag==3) dag3();
-if(dag==4) dag4();
+level();
 }
 
+/* EINDE */
 function einde(){
+
 update();
 
 let resultaat="";
+
 if(schuld>0){
-resultaat="⚠️ Je hebt schulden. Let op je keuzes!";
+resultaat="⚠️ Je hebt schulden!";
 }
 else if(geld<20){
-resultaat="💸 Je hebt weinig geld over.";
+resultaat="💸 Je geld is bijna op!";
 }
 else{
 resultaat="🧠 Jij bent een slimme consument!";
 }
 
-document.getElementById("tekst").innerHTML="🏁 Einde van het spel";
-
-document.getElementById("keuzes").innerHTML=`
-<h3>${resultaat}</h3>
-<button onclick="reset()">🔄 Opnieuw</button>
-`;
+tekst("🏁 Einde van jouw verhaal");
+keuzes(`<h2>${resultaat}</h2><button onclick="reset()">🔄 Opnieuw</button>`);
 }
 
+/* RESET */
 function reset(){
-geld=100; geluk=50; schuld=0; dag=1;
-update();
-start();
+geld=100;
+geluk=50;
+schuld=0;
+dag=1;
+level();
 }
 
-update();
-start();
+level();
+
 </script>
 
 </body>
